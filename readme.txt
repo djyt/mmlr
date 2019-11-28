@@ -1,8 +1,8 @@
 ---------------------------------------------------------------------------------------------------
                                  MML Reassembler and related tools
-								      reassembler.blogspot.com
-								      
-									  (c) 2019 dj_yt & cmonkey
+                                      reassembler.blogspot.com
+                                      
+                                      (c) 2019 dj_yt & cmonkey
 ...................................................................................................
 
 
@@ -175,12 +175,12 @@ For MAME to recognize the larger file, drivers/segaorun.cpp should be edited as 
 
 ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
 ROM_LOAD( "epr-10187.88", 0x00000, 0x8000, 
-		  CRC(a10abaa9) SHA1(01c8a819587a66d2ee4d255656e36fa0904377b0) )
+          CRC(a10abaa9) SHA1(01c8a819587a66d2ee4d255656e36fa0904377b0) )
 
 becomes:
 
 ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
 ROM_LOAD( "epr-10187.88", 0x00000, 0x10000, 
           CRC(a10abaa9) SHA1(01c8a819587a66d2ee4d255656e36fa0904377b0) )
-		  
+          
 ---------------------------------------------------------------------------------------------------
