@@ -77,6 +77,10 @@ We specify the offset of Passing Breeze (0x0e26).
 
 > python mmlr.py -out passing_breeze.asm epr-10187.88 0x0e26
 
+It should be noted that the asm contains a copy of the FM Patch table data. In the original 
+source, tracks regularly point to the SAME patch table. Unless you are changing the patches, you
+may want to remove the patch data and point back towards the original location. 
+
 
  Example 2: Extracting Magical Sound Shower from Z80 EPROM
 ...................................................................................................

@@ -42,11 +42,15 @@ def read_master_header(inputf, outputf, offset):
     decomp.offset_kf = get_word_p(inputf)       # Key Fractions
     decomp.offset_patches = get_word_p(inputf)  # FM Patch Data
 
+    outputf.write("\n" + globals.write_comment_header(
+        "Pointers. For space reasons, you may want to remove the surplus KF and FM Patch data." +
+        "\n; and point towards the original tables shown as [$xxxx] below"))
+
     outputf.write("\nmain:\n")
-    outputf.write(globals.ASMLINE.format("defw", "track_headers", "; pointer to track headers"))
-    outputf.write(globals.ASMLINE.format("defw", "tl", "; pointer to Total Level adjustment lookups"))
-    outputf.write(globals.ASMLINE.format("defw", "kf", "; pointer to Key Fraction lookups"))
-    outputf.write(globals.ASMLINE.format("defw", "fm_patches", "; pointer to FM patch data"))
+    write_header_pointer(outputf, "track_headers", "; pointer to track headers", decomp.offset_headers)
+    write_header_pointer(outputf, "tl", "; pointer to Total Level adjustment lookups", decomp.offset_tl)
+    write_header_pointer(outputf, "kf", "; pointer to Key Fraction lookups", decomp.offset_kf)
+    write_header_pointer(outputf, "fm_patches", "; pointer to FM patch data", decomp.offset_patches)
 
     track_headers = setup_track_headers(inputf, outputf, decomp.offset_headers)
 
@@ -98,6 +102,12 @@ def read_master_header(inputf, outputf, offset):
     for sub in decomp.subroutines:
         setup_track_data(inputf, outputf, sub, decomp, True)
 
+    return
+
+
+def write_header_pointer(outputf, label, comment, offset):
+    comment += " [" + globals.asm_hex(offset + src_origin) + "]"
+    outputf.write(globals.ASMLINE.format("defw", label, comment))
     return
 
 
@@ -363,8 +373,8 @@ def main():
             outputf.write("\n" +
                           globals.ASMLINE.format("INCLUDE", "OR_defines.asm", "; siMMpLified defines"))
             outputf.write(globals.ASMLINE.format("INCLUDE", "OR_macros.asm", "; siMMpLified macros"))
-            outputf.write(globals.ASMLINE.format("org    ",
-                                                 globals.asm_hex(src_offset), "; Target Origin. Edit as required!"))
+            outputf.write(globals.ASMLINE.format("org    ", globals.asm_hex(src_offset + src_origin),
+                                                 "; Target Origin. Edit as required!"))
 
             read_master_header(inputf, outputf, src_offset)
 

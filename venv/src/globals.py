@@ -8,7 +8,7 @@ ASMLINE = SPACE + "{0}" + SPACE + "{1:<24}" + SPACE + "{2}\n"
 ASMLINE2 = SPACE + "{0}" + SPACE + "{1:<15}" + SPACE + "{2:<5}" + SPACE + "{3}\n"
 
 PROGRAM_NAME = "MML Reassembler"
-VERSION = "v0.13"
+VERSION = "v0.14"
 
 
 # Convert value to assembly hex
