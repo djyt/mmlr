@@ -44,7 +44,7 @@ def read_master_header(inputf, outputf, offset):
 
     outputf.write("\n" + globals.write_comment_header(
         "Pointers. For space reasons, you may want to remove the surplus KF and FM Patch data." +
-        "\n; and point towards the original tables shown as [$xxxx] below"))
+        "\n; Code can point towards the original tables shown as [$xxxx] below"))
 
     outputf.write("\nmain:\n")
     write_header_pointer(outputf, "track_headers", "; pointer to track headers", decomp.offset_headers)
