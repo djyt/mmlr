@@ -25,7 +25,7 @@ it into the OR game easier than without this info (hopefully!).
 Basically the tunes in SHO and OR (and also many other 16-bit Sega arcade titles of the same era like Hang-On, Space
 Harrier, Enduro Racer, After Burner, Power Drift, etc) are simply streams of MIDI note values and durations.  According
 to various sources on the internet (reassembler's blog being the main one that I refer to) the tunes were originally 
-transcribed from sheet music into MML (Macro Music Language).  After the transription it's possible there would then 
+transcribed from sheet music into MML (Music Macro Language).  After the transription it's possible there would then 
 have been some kind of tool to convert the MML data into the format used by the audio engine of OR/SHO/etc.
 
 The power and flexibility of the audio engine comes in the form of the extended commands which can be used to perform 
@@ -56,7 +56,7 @@ Tune format
 -----------
 Each tune starts with 4 pointers :-
 
-1) pointer to FM/PCM track headers
+1) pointer to number of tracks and FM/PCM track headers
 2) pointer to TL adjustments (all existing tunes use an address of $6997, so should your tune in the beginning)
 3) pointer to key fractions lookups (all existing tunes use an address of $6997, so should your tune in the beginning)
 4) pointer to YM2151 FM sound patch data bank
@@ -97,15 +97,15 @@ After the track headers comes the FM and PCM track data.
 So, how does this look using a real OR tune (Passing Breeze) as an example :-
 
 ; master tune header
-PassingBreeze:			defw	PassingBreezeTrackHeaders	; pointer to track headers
+PassingBreeze:			defw	PassingBreezeTrackHeaders	; pointer to number of tracks and track headers
 				defw	PassingBreezeTLAdjustments	; pointer to TL adjustment lookups ($6997)
 				defw	PassingBreezeKeyFractions	; pointer to key fractions lookups ($6997)
 				defw	PassingBreezeFMPatchData	; pointer to FM patch data
 		
-				defb	13				; number of tracks in this tune	
+PassingBreezeTrackHeaders:	defb	13				; number of tracks in this tune	
 
 ; track header pointers
-PassingBreezeTrackHeaders:	defw	PBfmTrack0header		; pointer to FM track 0 header
+				defw	PBfmTrack0header		; pointer to FM track 0 header
 				defw	PBfmTrack1header
 				defw	PBfmTrack2header
 				defw	PBfmTrack3header
