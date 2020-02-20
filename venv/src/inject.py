@@ -21,7 +21,9 @@ def main():
     epilog = "Target Data and Commands are as follows:\n" + \
              "1 = Passing Breeze        2 = Splash Wave\n" + \
              "3 = Magical Sound Shower  4 = Last Wave\n" + \
-             "5 = Unused Command / Create New Bank at 0x8000 for destination (default)"
+             "5 = Unused Command / Create New Bank at 0x8000 for destination (default)\n\n" +\
+             "Timer argument is required only when injecting music from other Sega engines.\n" +\
+             "(e.g. Turbo OutRun requires 0x96)"
 
     parser = argparse.ArgumentParser(
         description="MML Injector - A quick way to inject music data in OutRun's Z80 EPROM.",
@@ -32,6 +34,7 @@ def main():
     parser.add_argument("outputFile", help="Output Z80 program code")
     parser.add_argument("-data", help="Target data to replace", type=int, choices=range(1, 6), default=5)
     parser.add_argument("-cmd", help="Z80 command to replace", type=int, choices=range(1, 6), default=5)
+    parser.add_argument("-timer", help="Timer A value (hex)", type=str, default=0)
     args = parser.parse_args()
 
     cmd_replace = int(args.cmd)
@@ -40,6 +43,8 @@ def main():
     data_replace = int(args.data) - 1
     data_target = destination[data_replace]
     data_length = lengths[data_replace]
+
+    timera = int(args.timer, 0)
 
     with open(args.inputFile, "rb") as inputf:
         with open(args.injectFile, "rb") as injectf:
@@ -72,13 +77,13 @@ def main():
                 outputf.write(src_bytes)
 
                 # Patch Z80 File To Insert New Tune
-                update_z80_code(outputf, data_target, cmd_id)
+                update_z80_code(outputf, data_target, cmd_id, timera)
 
                 print("Done")
     return
 
 
-def update_z80_code(outputf, data_target, cmd_id):
+def update_z80_code(outputf, data_target, cmd_id, timera):
     # Entry to clobber in Z80 command table (2 is unused so best to use it!)
     command_index = (cmd_id & 0x7f) - 1
 
@@ -102,6 +107,15 @@ def update_z80_code(outputf, data_target, cmd_id):
     # Insert New Routine
     outputf.seek(z80_dst)
     outputf.write(bytes([0xcd, 0x61, 0x05]))           # call $0561		; reset FM chip
+
+    # Only used if we are porting a tune from a different engine with a unique TimerA value
+    # For example, Turbo OutRun uses $96, which shifted twice is $258 (600)
+    # (64 * (1024 - 600) / 4000 = 6.36ms)
+    if timera:
+        outputf.write(bytes([0x3e, timera]))           # ld a, $xx      ; Load Timer A value
+        outputf.write(bytes([0x0e, 0x10]))             # ld c, $10      ; Load Register value
+        outputf.write(bytes([0xcd, 0x75, 0x0a]))       # call $0a75     ; Write timer value to register
+
     outputf.write(bytes([0x3a, 0x08, 0xf8]))           # ld a,($f808)	; get sound properties
     outputf.write(bytes([0xcb, 0xc7]))                 # set 0,a        ; trigger rev effect
     outputf.write(bytes([0x32, 0x08, 0xf8]))           # ld($f808), a   ; write back sound properties
