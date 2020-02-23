@@ -104,6 +104,29 @@ def update_z80_code(outputf, data_target, cmd_id, timera):
     outputf.seek(fm_offset)
     outputf.write(to_bytes(data_target))
 
+    # SEAMLESS command support
+    outputf.seek(0x014d)
+    outputf.write(bytes([0xc3, 0x00, 0x7e]))           # change a call $0a70 to a jp $7e00
+    outputf.seek(0x0296)
+    outputf.write(bytes([0x3, 0x7e]))                  # change a jp target address from $0150 to $7e03
+    outputf.seek(0x0b99)
+    outputf.write(bytes([0x15, 0x7e]))                 # change pointer to unused command $83 to new command $83 routine
+    outputf.seek(0xbaf)
+    outputf.write(bytes([0xb, 0x7e]))                  # change pointer to command $8e to new command $8e routine
+    # check for 'seamless' bit and DON'T turn current note off if it's set
+    outputf.seek(0x7e00)
+    outputf.write(bytes([0xcd, 0x70, 0x0a]))           # call $0a70		; write data to sound chip
+    outputf.write(bytes([0xdd, 0xcb, 0x00, 0x46]))     # bit 0,(ix+0)   ; test 'seamless' bit
+    outputf.write(bytes([0xc0]))                       # ret nz			; return if it's set
+    outputf.write(bytes([0xc3, 0x50, 0x01]))           # jp $0150		; else continue
+    # updated command $8e to clear 'seamless' bit as well as 'pitch bend' bit
+    outputf.write(bytes([0xdd, 0xcb, 0x00, 0xae]))     # res  5,(ix+$00)		; clear 'pitch bend' bit
+    outputf.write(bytes([0xdd, 0xcb, 0x00, 0x86]))     # res  0,(ix+$00)		; clear 'seamless' bit
+    outputf.write(bytes([0x1b, 0xc9]))                 # dec de, ret
+    # new command $83 for 'seamless' note transition support
+    outputf.write(bytes([0xdd, 0xcb, 0x00, 0xc6]))     # set  0,(ix+$00)		; set 'seamless' bit
+    outputf.write(bytes([0x1b, 0xc9]))                 # dec de, ret
+
     # Insert New Routine
     outputf.seek(z80_dst)
     outputf.write(bytes([0xcd, 0x61, 0x05]))           # call $0561		; reset FM chip
