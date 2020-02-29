@@ -16,6 +16,7 @@ commands = (0x80, 0x81, 0x82, 0x85, 0xA5, 0x83)
 def to_bytes(value):
     return value.to_bytes(2, byteorder='little')
 
+
 def main():
 
     epilog = "Target Data and Commands are as follows:\n" + \
@@ -55,7 +56,7 @@ def main():
                 # Check injection file will fit
                 inject_bytes = injectf.read()
                 if len(inject_bytes) > data_length:
-                    print ("ERROR: Injection File is " + len(inject_bytes)-data_length +
+                    print("ERROR: Injection File is " + str(len(inject_bytes)-data_length) +
                            "bytes too big for insertion here")
                     return
 
