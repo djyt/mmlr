@@ -709,7 +709,13 @@ FMpatch2:			defb	TL_M1,		$1f
 
 
 
-The ordering of the registers is irrelevant but you MUST terminate each set of patch data with a 2.
+IMPORTANT NOTE
+--------------
+The ordering of the first 25 register pairings shown above is irrelevant but you MUST ensure that the RL/FB/CONNECT pair is the 
+26th and final pairing of the patch data set, this is because the LEFT_CH_ONLY/RIGHT_CH_ONLY/BOTH_CHANNELS commands expect the 
+RL/FB/CONNECT value to be located exactly 51 bytes from the start of the patch data set. 
+
+You MUST also remember to terminate each patch data set with a terminating value of 2.
 
 
 If the patch loader reads 3 as the register value it treats the next 2 bytes it reads as a pointer and reads the patch data
